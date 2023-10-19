@@ -9,17 +9,17 @@ export const Task = objectType({
     t.string('title')
     t.string('description')
     t.string('status')
-    t.nonNull.string('userId')
+    t.string('userId')
     t.field('user', {
       type: User,
-      async resolve(_parent, _args, ctx) {
+      async resolve(parent, _args, ctx) {
         return await ctx.prisma.task
           .findUnique({
             where: {
-              id: _parent.id,
+              id: parent.id,
             },
           })
-          .User()
+          .users()
       },
     })
   },

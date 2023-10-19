@@ -3,12 +3,22 @@ import TaskComponent from './TaskComponent';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, Button, Form, Card, Container } from 'react-bootstrap';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import AddTaskModal from "@/components/layout/AddTaskModal";
+import { Droppable } from 'react-beautiful-dnd';
 interface BoardSectionProps {
     title: string;
     tasks: Array<Task>;
 }
 
 const BoardSection: React.FC<BoardSectionProps> = ({ title, tasks }) => {
+    const [showModal, setShowModal] = useState(false);
+
+    const handleClose = () => {
+        setShowModal(false);
+    }
+
+    const handleShow = () => setShowModal(true);
+
     return (
         <>
             <Col md={3} className='d-flex flex-column p-2' >
@@ -16,42 +26,55 @@ const BoardSection: React.FC<BoardSectionProps> = ({ title, tasks }) => {
                     <h3 className='me-auto'>{title}</h3>
                     <FontAwesomeIcon icon={faPlus} style={{ 'color': '#6f7782'}}/>
                 </div>
-                <Container className='p-0 d-flex flex-column h-100'>
-                  {
-                    tasks &&
-                    tasks.map((task: Task, index: number ) => {
-                        return (
-                            <TaskComponent
-                            title={task.title}
-                            description={task.description}
-                            id={task.id}
-                            key={task.id}
-                            status={task.status}
-                            />
-                        )
-                    })
-                  }
-                  {
-                    tasks.length > 0 &&
-                    <Button className='add-wrapper'>
-                    <FontAwesomeIcon icon={faPlus} style={{ 'color': '#6f7782'}}/>
-                    Add Task
-                    </Button>
-                  }
-                  {
-                    tasks.length === 0 &&
-                    <div className='is-empty d-flex flex-column'>
-                        <Button className='add-wrapper'>
-                        <FontAwesomeIcon icon={faPlus} style={{ 'color': '#6f7782'}}/>
-                        Add Task
+                <Droppable droppableId={title}>
+                {(provided) => (
+                    <Container className='p-0 d-flex flex-column h-100'
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    >
+                    {
+                        tasks &&
+                        tasks.map((task: Task, index: number ) => {
+                            return (
+                                <TaskComponent
+                                title={task.title}
+                                description={task.description}
+                                id={task.id}
+                                key={task.id}
+                                boardCategory={title}
+                                index={index}
+                                />
+                            )
+                        })
+                    }
+                    {
+                        tasks.length > 0 &&
+                        <Button className='add-wrapper' onClick={handleShow}>
+                            <FontAwesomeIcon icon={faPlus} style={{ 'padding': '2px'}}/>
+                            Add Task
                         </Button>
+                    }
+                    {
+                        tasks.length === 0 &&
+                        <div className='is-empty d-flex flex-column'>
+                            <Button className='add-wrapper' onClick={handleShow}>
+                            <FontAwesomeIcon icon={faPlus} style={{ 'padding': '2px'}}/>
+                            Add Task
+                            </Button>
+                    </div>
 
-                   </div>
-
-                  }
-                </Container>
+                    }
+                    {provided.placeholder}
+                    </Container>
+                )}
+                </Droppable>
 
             </Col>
+            <AddTaskModal
+                showModal={showModal}
+                handleClose={handleClose}
+                boardCategory={title}
+            />  
         </>
     )
 }

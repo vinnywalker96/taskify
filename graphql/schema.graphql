@@ -27,7 +27,7 @@ type Task {
   status: String
   title: String
   user: User
-  userId: String!
+  userId: String
 }
 
 type User {
