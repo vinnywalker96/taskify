@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "localhost:3000/board",
+            "request": "launch",
+            "url": "localhost:3000/board"
+        }
+    ]
+}

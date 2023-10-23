@@ -3,18 +3,20 @@ import TaskComponent from './TaskComponent';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, Button, Form, Card, Container } from 'react-bootstrap';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import AddTaskModal from "@/components/layout/AddTaskModal";
+import AddTaskModal from "@/app/components/layout/AddTaskModal";
 import { Droppable } from 'react-beautiful-dnd';
 interface BoardSectionProps {
     title: string;
-    tasks: Array<Task>;
+    tasks: any;
+    reFetchTasks: () => void;
 }
 
-const BoardSection: React.FC<BoardSectionProps> = ({ title, tasks }) => {
+const BoardSection: React.FC<BoardSectionProps> = ({ title, tasks, reFetchTasks }) => {
     const [showModal, setShowModal] = useState(false);
 
     const handleClose = () => {
         setShowModal(false);
+        reFetchTasks();
     }
 
     const handleShow = () => setShowModal(true);
@@ -41,8 +43,8 @@ const BoardSection: React.FC<BoardSectionProps> = ({ title, tasks }) => {
                                 description={task.description}
                                 id={task.id}
                                 key={task.id}
-                                boardCategory={title}
                                 index={index}
+                                
                                 />
                             )
                         })

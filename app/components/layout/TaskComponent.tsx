@@ -1,18 +1,40 @@
 import React , { useState } from 'react';
 import { Card, Form, Button, Modal, Fade } from 'react-bootstrap';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/faTrashAlt';
 import { Draggable } from 'react-beautiful-dnd';
 
 
+const AllTasksQuery = gql`
+    query {
+        tasks {
+            id
+            title 
+            description
+            status
+        
+        }
+    }
+`
+
+const AllUsersQuery = gql`
+    query {
+        users {
+            id
+            name
+        }
+    }
+`
+
 const UpdateTaskMutation  = gql`
-    mutation UpdateTaskMutation($id: String!, $title: String!, $description: String!, $status: String!, $userId: String) {
+    mutation UpdateTaskMutation($id: String!, $title: String, $description: String, $status: String!, $userId: String) {
         updateTask(id: $id, title: $title, description: $description, status: $status, userId: $userId) {
             id
             title 
             description
             status
+    
         }
     }
 `
@@ -24,14 +46,18 @@ const DeleteTaskMutation = gql`
     }
 `
 
-const TaskComponent: React.FC<Task> = ({ title, description, id, boardCategory, index }) => {
+
+
+const TaskComponent: React.FC<Task> = ({ title, description, id, boardCategory, index, userId }) => {
     const [taskTitle, setTaskTitle] = useState(title);
     const [taskDescription, setTaskDescription] = useState(description);
-    const [assignTo, setAssignTo] = useState('');
+    const [assignTo, setAssignTo] = useState(userId ? userId: '');
 
     const [updateTask, { data, loading, error }] = useMutation(UpdateTaskMutation);
     const [deleteTask] = useMutation(DeleteTaskMutation);
     const [showModal, setShowModal] = useState(false);
+
+    const { data: usersData, loading: usersLoading } = useQuery(AllUsersQuery); 
 
     const handleClose = () => {
         setShowModal(false);
@@ -39,14 +65,22 @@ const TaskComponent: React.FC<Task> = ({ title, description, id, boardCategory, 
 
     const handleShow = () => setShowModal(true);
 
-    const handleTaskUpdate = (e) => {
+    const handleTaskUpdate = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
+
+        let userId = '';
+        if (assignTo){
+            userId = assignTo;
+        } else if (usersData) {
+            userId = usersData.users[0].id;
+        }
         updateTask({
             variables: {
                 title: taskTitle,
                 description: taskDescription,
                 id: id,
-                status: boardCategory
+                status: boardCategory,
+                userId: userId
             }
         });
         handleClose();
@@ -64,7 +98,7 @@ return (
         <>
             <Draggable draggableId={id} index={index}>
                 {(provided) => (
-                <Card className='task-container' onClick={() => handleShow()} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                <Card className='task-container p-2' onClick={() => handleShow()} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
                     <Card.Body>{title}</Card.Body>
                 </Card>)}
             </Draggable>

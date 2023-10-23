@@ -1,6 +1,8 @@
 import { objectType, extendType, stringArg, nonNull , intArg} from 'nexus'
 import { User } from './Users'
 
+
+
 export const Task = objectType({
   name: 'Task',
   definition(t) {
@@ -16,10 +18,10 @@ export const Task = objectType({
         return await ctx.prisma.task
           .findUnique({
             where: {
-              id: parent.id,
+              id: parent.id || undefined,
             },
           })
-          .users()
+          .user()
       },
     })
   },
@@ -71,7 +73,7 @@ export const TaskMutation = extendType({
            title: args.title,
            description: args.description,
            userId: args.userId,
-           id: args.id,
+           id: args.id || undefined,
            status: args.status,
          }
        })
@@ -88,14 +90,23 @@ export const TaskMutation = extendType({
         status: stringArg(),
       },
       resolve(_root, args, ctx) {
+        const { id, title, description, userId, status } = args;
         return ctx.prisma.task.update({
-          where: { id: args.id },
+          where: { id },
           data: {
-            title: args.title,
-            description: args.description,
-            userId: args.userId,
-            status: args.status,
+            title: title || undefined,
+            description: description || undefined,
+            userId,
+            status,
           },
+        }).then((updatedTask) => {
+          return {
+            id: updatedTask.id,
+            title: updatedTask.title,
+            description: updatedTask.description,
+            userId: updatedTask.userId,
+            status: updatedTask.status,
+          };
         });
       },
     });

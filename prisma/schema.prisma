@@ -4,13 +4,10 @@
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  url      = env("DATABASE_URL")
 }
-
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -19,8 +16,8 @@ model User {
   image         String?
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @default(now()) @map(name: "updated_at")
-  role          Role      @default(FREE)
-  tasks         Task[]
+  role      Role     @default(FREE)
+  tasks     Task[]
   accounts      Account[]
   sessions      Session[]
 }

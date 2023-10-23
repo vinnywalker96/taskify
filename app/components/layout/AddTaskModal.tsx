@@ -1,16 +1,34 @@
 import React, { useState } from 'react'
 import { Col, Button, Card , Form, Container, Modal } from 'react-bootstrap';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { setDefaultAutoSelectFamily } from 'net';
 
+const AllTasksQuery = gql`
+  query {
+    tasks {
+      id
+      title
+      description
+      status
+    }
+  }
+`
 
 const CreateTaskMutation = gql`
-    mutation createTask($id: String, $title: String!, $description: String!, $status: String!, $userId: String) {
+    mutation createTask($id: String, $title: String, $description: String, $status: String, $userId: String) {
         createTask(id: $id, title: $title, description: $description, status: $status, userId: $userId) {
             id
             title 
             description
             status
+        }
+    }
+`
+
+const AllUsersQuery = gql`
+    query {
+        users {
+            id
+            name
         }
     }
 `
@@ -22,7 +40,7 @@ const AddTaskModal = ({
 }: {
     showModal: boolean;
     handleClose: () => void;
-    boardCategory: String;
+    boardCategory: string;
 }) => {
     const [taskTitle, setTaskTitle] = useState('');
     const [taskDescription, setTaskDescription] = useState('');
@@ -36,15 +54,32 @@ const AddTaskModal = ({
         }
     })
 
-    const handleTaskCreate = (e) => {
+    const { data: usersData, loading: usersLoading } = useQuery(AllUsersQuery);
+
+    const handleTaskCreate = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
+
+        let userId = '';
+        if (assignTo){
+            userId = assignTo;
+        } else if (usersData) {
+            userId = usersData.users[0].id;
+        }
         createTask({
             variables: {
                 title: taskTitle,
                 description: taskDescription,
                 status: boardCategory,
+            },
+            update: (cache, { data: { addItem }}) => {
+                const data: any = cache.readQuery({ query: AllTasksQuery });
+                const updatedTasks = [...data.tasks, createTask];
+                cache.writeQuery({
+                    query: AllTasksQuery,
+                    data: { task: updatedTasks}
+                });
             }
-        })
+        });
         handleClose();
     }
     return (
@@ -64,7 +99,16 @@ const AddTaskModal = ({
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Assign To</Form.Label>
-                        <Form.Select value={assignTo} onChange={(e) => { setAssignTo(e.target.value)}}></Form.Select>
+                        <Form.Select value={assignTo} onChange={(e) => { setAssignTo(e.target.value)}}>
+                            {
+                                usersData &&
+                                usersData.users.map((user: User) => {
+                                    return (
+                                        <option value={user.id} key={user.id} >{user.name}</option>
+                                    )
+                                })
+                            }
+                        </Form.Select>
                     </Form.Group>
                     <Button variant="primary" type="submit">Submit</Button>
                 </Form>

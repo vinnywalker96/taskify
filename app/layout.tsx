@@ -1,6 +1,13 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Poppins } from 'next/font/google'
+import { Container } from 'react-bootstrap'
+
+const poppins = Poppins({
+   weight: ['400', '700'],
+   subsets: ['latin']
+});
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,7 +23,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={ poppins.className }>
+        <Container>
+           {children}
+        </Container>
+        </body>
     </html>
   )
 }

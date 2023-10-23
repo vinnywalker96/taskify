@@ -1,9 +1,14 @@
 import React from 'react'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import Link from 'next/link'
+import { Card, CardHeader } from 'react-bootstrap'
 
-export default function Home() {
+const HomePage = () => {
   return (
-    <div>
-      Hello
-    </div> )
+    <>
+  
+    </>
+ 
+  )
 }
+
+export default HomePage

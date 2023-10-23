@@ -1,0 +1,51 @@
+[debug] [2023-10-20T12:30:41.021Z] ----------------------------------------------------------------------
+[debug] [2023-10-20T12:30:41.024Z] Command:       /usr/local/bin/firebase /Users/vinny/.cache/firebase/tools/lib/node_modules/firebase-tools/lib/bin/firebase deploy
+[debug] [2023-10-20T12:30:41.025Z] CLI Version:   12.7.0
+[debug] [2023-10-20T12:30:41.025Z] Platform:      darwin
+[debug] [2023-10-20T12:30:41.025Z] Node Version:  v16.16.0
+[debug] [2023-10-20T12:30:41.034Z] Time:          Fri Oct 20 2023 14:30:41 GMT+0200 (South Africa Standard Time)
+[debug] [2023-10-20T12:30:41.034Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-10-20T12:30:41.122Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-10-20T12:30:41.123Z] > authorizing via signed-in user (vinnywalker96@gmail.com)
+[debug] [2023-10-20T12:30:41.123Z] [iam] checking project proximo-402411 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-10-20T12:30:41.128Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/proximo-402411:testIamPermissions [none]
+[debug] [2023-10-20T12:30:41.128Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/proximo-402411:testIamPermissions x-goog-quota-user=projects/proximo-402411
+[debug] [2023-10-20T12:30:41.128Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/proximo-402411:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-10-20T12:30:43.231Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/proximo-402411:testIamPermissions 200
+[debug] [2023-10-20T12:30:43.231Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/proximo-402411:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-10-20T12:30:43.232Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/proximo-402411 [none]
+[debug] [2023-10-20T12:30:43.789Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/proximo-402411 200
+[debug] [2023-10-20T12:30:43.789Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/proximo-402411 {"projectId":"proximo-402411","projectNumber":"990437525172","displayName":"proximo","name":"projects/proximo-402411","resources":{"hostingSite":"proximo-402411"},"state":"ACTIVE","etag":"1_64894e4b-ae77-43b7-83e3-775da6db9119"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[info]    Creating an optimized production build ...
+
+[info]  ✓ Compiled successfully
+
+[info]    Linting and checking validity of types ...
+
+[info] Failed to compile.
+
+./components/layout/header.tsx:12:21
+Type error: 'session.user' is possibly 'undefined'.
+
+  10 |     useEffect(() => {
+  11 |         if (session) {
+> 12 |             setName(session.user.name)
+     |                     ^
+  13 |         }
+  14 |     },[session])
+  15 |     return (
+
+[debug] [2023-10-20T12:31:33.114Z] Error: ENOENT: no such file or directory, open '/Users/vinny/taskify/.next/export-marker.json'
+[error] 
+[error] Error: An unexpected error has occurred.
