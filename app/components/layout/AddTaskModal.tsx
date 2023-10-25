@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Col, Button, Card , Form, Container, Modal } from 'react-bootstrap';
 import { gql, useMutation, useQuery } from '@apollo/client';
 
+
 const AllTasksQuery = gql`
   query {
     tasks {
@@ -13,8 +14,17 @@ const AllTasksQuery = gql`
   }
 `
 
+const AllUsersQuery = gql`
+    query {
+        users {
+            id
+            name
+        }
+    }
+`
+
 const CreateTaskMutation = gql`
-    mutation createTask($id: String, $title: String, $description: String, $status: String, $userId: String) {
+    mutation createTask($id: String, $title: String!, $description: String!, $status: String!, $userId: String) {
         createTask(id: $id, title: $title, description: $description, status: $status, userId: $userId) {
             id
             title 
@@ -24,14 +34,6 @@ const CreateTaskMutation = gql`
     }
 `
 
-const AllUsersQuery = gql`
-    query {
-        users {
-            id
-            name
-        }
-    }
-`
 
 const AddTaskModal = ({
     showModal,
@@ -52,7 +54,7 @@ const AddTaskModal = ({
             setTaskDescription('');
             setAssignTo('');
         }
-    })
+    });
 
     const { data: usersData, loading: usersLoading } = useQuery(AllUsersQuery);
 
@@ -65,21 +67,23 @@ const AddTaskModal = ({
         } else if (usersData) {
             userId = usersData.users[0].id;
         }
-        createTask({
+       createTask({
             variables: {
                 title: taskTitle,
                 description: taskDescription,
                 status: boardCategory,
+                userId: userId
             },
-            update: (cache, { data: { addItem }}) => {
+            update: (cache, { data: { createTask: createdTask } }) => {
                 const data: any = cache.readQuery({ query: AllTasksQuery });
-                const updatedTasks = [...data.tasks, createTask];
+                const updatedTasks = [...data.tasks, createdTask];
                 cache.writeQuery({
                     query: AllTasksQuery,
-                    data: { task: updatedTasks}
-                });
-            }
-        });
+                    data: { tasks: updatedTasks }
+    });
+}
+
+       })
         handleClose();
     }
     return (
@@ -95,7 +99,7 @@ const AddTaskModal = ({
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Description</Form.Label>
-                        <Form.Control type="text" value={taskDescription} onChange={(e) => {setTaskDescription(e.target.value)}}></Form.Control>
+                        <Form.Control as="textarea" style={{ 'height': '100px'}} value={taskDescription} onChange={(e) => {setTaskDescription(e.target.value)}}></Form.Control>
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Assign To</Form.Label>
@@ -104,7 +108,7 @@ const AddTaskModal = ({
                                 usersData &&
                                 usersData.users.map((user: User) => {
                                     return (
-                                        <option value={user.id} key={user.id} >{user.name}</option>
+                                        <option value={user.id} key={user.id}>{user.name}</option>
                                     )
                                 })
                             }

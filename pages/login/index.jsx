@@ -1,19 +1,20 @@
 import React, { useEffect } from "react";
 import { Card, Form, Button } from "react-bootstrap";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession,  } from "next-auth/react";
 import { useRouter } from 'next/router';
 
 const Login = () => {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter();
 
   useEffect(() => {
-    if (session) {
+    if (session && status === 'authenticated') {
         router.push('/board')
       }
-  }, [router, session])
+  }, [router, session, status])
 
   return (
+    <>
     <div>
       <Card className="login-card">
         <Card.Header>Login</Card.Header>
@@ -34,6 +35,9 @@ const Login = () => {
         </Card.Body>
       </Card>
     </div>
+    
+    </>
+    
   );
 };
 

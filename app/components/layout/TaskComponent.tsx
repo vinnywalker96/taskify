@@ -1,6 +1,6 @@
 import React , { useState } from 'react';
-import { Card, Form, Button, Modal, Fade } from 'react-bootstrap';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { Card, Form, Button, Modal } from 'react-bootstrap';
+import { Reference, StoreObject, gql, useMutation, useQuery } from '@apollo/client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/faTrashAlt';
 import { Draggable } from 'react-beautiful-dnd';
@@ -28,7 +28,7 @@ const AllUsersQuery = gql`
 `
 
 const UpdateTaskMutation  = gql`
-    mutation UpdateTaskMutation($id: String!, $title: String, $description: String, $status: String!, $userId: String) {
+    mutation UpdateTaskMutation($id: String!, $title: String, $description: String, $status: String, $userId: String) {
         updateTask(id: $id, title: $title, description: $description, status: $status, userId: $userId) {
             id
             title 
@@ -49,15 +49,14 @@ const DeleteTaskMutation = gql`
 
 
 const TaskComponent: React.FC<Task> = ({ title, description, id, boardCategory, index, userId }) => {
+    const [showModal, setShowModal] = useState(false);
     const [taskTitle, setTaskTitle] = useState(title);
     const [taskDescription, setTaskDescription] = useState(description);
-    const [assignTo, setAssignTo] = useState(userId ? userId: '');
-
     const [updateTask, { data, loading, error }] = useMutation(UpdateTaskMutation);
     const [deleteTask] = useMutation(DeleteTaskMutation);
-    const [showModal, setShowModal] = useState(false);
-
     const { data: usersData, loading: usersLoading } = useQuery(AllUsersQuery); 
+    const [assignTo, setAssignTo] = useState(userId ? userId : '');
+
 
     const handleClose = () => {
         setShowModal(false);
@@ -69,28 +68,34 @@ const TaskComponent: React.FC<Task> = ({ title, description, id, boardCategory, 
         e.preventDefault();
 
         let userId = '';
-        if (assignTo){
+        if (assignTo) {
             userId = assignTo;
         } else if (usersData) {
             userId = usersData.users[0].id;
         }
-        updateTask({
-            variables: {
-                title: taskTitle,
-                description: taskDescription,
-                id: id,
-                status: boardCategory,
-                userId: userId
-            }
-        });
-        handleClose();
 
+        updateTask({ variables: { 
+            title: taskTitle, 
+            description: taskDescription, 
+            id: id,
+            status: boardCategory,
+            userId: userId
+        }});
+        handleClose();
     }
     const handleTaskDelete = () => {
-        deleteTask({
-            variables: {
-                id: id,
-            }
+       deleteTask({ variables: { id: id },
+        update: (cache) => {
+            cache.modify({
+                fields: {
+                    tasks(existingTasksRefs, { readField }) {
+                        return existingTasksRefs.filter(
+                            (taskRef: Reference | StoreObject | undefined) => id !== readField('id', taskRef)
+                        );
+                    },
+                },
+            })
+        }
         })
         handleClose();
     }
@@ -119,7 +124,16 @@ return (
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Assign To</Form.Label>
-                        <Form.Select value={assignTo} onChange={(e) => { setAssignTo(e.target.value)}}></Form.Select>
+                        <Form.Select aria-label="Assign To">
+                            {
+                                usersData &&
+                                usersData.users.map((user: User) => {
+                                    return (
+                                        <option value={user.id} key={user.id} >{user.name}</option>
+                                    )
+                                })
+                            }
+                        </Form.Select>
                     </Form.Group>
                     <div className='d-flex justify-content-between'>
                         <Button variant="primary" type="submit">Update</Button>

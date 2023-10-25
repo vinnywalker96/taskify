@@ -39,7 +39,7 @@ const Header = () => {
                     <Navbar.Text className='p-4'>
                         {session ? (
                             // User is logged in, display logout button
-                            <Button variant='primary' onClick={() => signOut}>
+                            <Button variant='primary' onClick={() => signOut()}>
                                 Logout
                             </Button>
                         ) : (

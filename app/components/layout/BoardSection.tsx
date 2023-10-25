@@ -45,6 +45,7 @@ const BoardSection: React.FC<BoardSectionProps> = ({ title, tasks, reFetchTasks 
                                 key={task.id}
                                 index={index}
                                 
+                                
                                 />
                             )
                         })

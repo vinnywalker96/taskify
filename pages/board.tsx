@@ -4,7 +4,7 @@ import { Row } from 'react-bootstrap';
 import BoardSection from '@/app/components/layout/BoardSection';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { useSession } from 'next-auth/react';
-import { get } from 'http';
+
 
 const AllTasksQuery = gql`
     query { 
@@ -125,7 +125,7 @@ const Board = () => {
 
     const reFetchTasks = () => {
         if (session){
-            getTasks({ variables: { email: session?.user?.email }})
+            getTasks({ variables: { email: session.user.email }})
         }
     }
 
